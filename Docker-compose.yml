@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  wordpress:
+    image: wordpress:latest  # Use the official WordPress image
+    container_name: wordpress_container
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppassword
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - webapp-network
+
+  nginx:
+    image: nginx:latest  # Use the official Nginx image
+    container_name: nginx_container
+    restart: always
+    ports:
+      - "80:80"  # Expose port 80 to the host (AWS instance)
+    networks:
+      - webapp-network
+    volumes:
+      - ./nginx/hugo.conf:/etc/nginx/hugo.conf  # Custom Nginx configuration
+      - wordpress_data:/var/www/html  # Link to WordPress files
+
+networks:
+  webapp-network:
+    driver: bridge
+
+volumes:
+  wordpress_data:
